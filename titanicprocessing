@@ -1,0 +1,205 @@
+import numpy as np
+import pandas as pd 
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.model_selection import cross_validate
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, ExtraTreesClassifier
+from sklearn.pipeline import Pipeline
+
+data = pd.read_csv('/kaggle/input/titanic/train.csv')
+data.drop(['PassengerId'], axis = 1, inplace = True)
+data.head()
+# Here I'm dropping the first column indicating the Id of passengers
+
+sns.boxplot(y = data['Fare'], x = data['Survived'])
+# Here we can track the distribution of 'Fare' values, which is a continous, according to Survived.
+# We can and we should also use this boxplot by replacing 'Fare' with 'Age'. These boxplots can help us to hint about
+# what NaN values in 'Fare' and 'Age' columns can be replaced by without putting rough values like mean.
+
+def isalone(column):
+    if column == 0:
+        return 0
+    else:
+        return 1
+train['IsAlone'] = train['Parch'].apply(isalone)
+# This adds a new column that can show whether passenger is alone or not using the 'Parch' information. 
+
+def richfemale(columns):
+    if columns[0] > 1:
+        if columns[1] == 1:
+            if columns[2] == 1:
+                return 1
+            else:
+                return 2
+        else:
+            return 3
+    else:
+        return 0
+        
+# This function also adds new column by considering 'Fare', 'Pclass', and 'female' columns to determine 
+# whether passenger is female and rich (1) or male and rich (2) (1 and 2 based on Pclass, if Pclass is 1
+# then they can be considered as very rich, if Pclass is 2 or 3, without concering the sex this time 
+# I set it as intermediate rich, which is 3) or finally poor (0).  
+    
+def parch_corr(columns):
+    if pd.isnull(columns[0]) == True:
+        if columns[1] == 0:
+            return 0
+        else:
+            return 0.5
+    else:
+        return columns[0]
+
+def embarkcorr(column):
+    if column == 'C':
+        return 1
+    elif column == 'S':
+        return 2
+    elif column == 'Q':
+        return 3
+    else:
+        return 0
+train['Embarked'] = train['Embarked'].apply(embarkcorr)
+
+def agedet(columns):
+    Age = columns[0]
+    Pclas = columns[1]
+    Embark = columns[2]
+    if np.isnan(Age) == True:
+        if Embark == 3:
+            return 50
+        elif Pclas == 1:
+            return 38
+        elif Pclas == 2:
+            return 30
+        else:
+            return 25
+    else:
+        return Age
+train['Age'] = train[['Age', 'Pclass', 'Embarked']].apply(agedet, axis = 1)
+    
+def agecat(column):
+    if column <= 15:
+        return 0
+    elif 15<column<40:
+        return 1
+    else:
+        return 2
+
+train['Age'] = train['Age'].apply(agecat)
+
+train['Cabin'] = train['Cabin'].fillna(0)
+
+def cabin_crr(columns):
+        if columns == 0:
+            return columns
+        else:
+            column = columns[0]
+            if column == 'B':
+                return 2
+            elif column == 'C':
+                return 1
+            elif column == 'D':
+                return 3
+            elif column == 'F':
+                return 6
+            elif column == 'E':
+                return 4
+            elif column == 'A':
+                return 5
+            elif column == 'G':
+                return 7
+            else:
+                return 8 
+        
+train['Cabin'] = train['Cabin'].apply(cabin_crr)
+
+def Pclasscorr(column):
+    if column == 1:
+        return '1'
+    elif column == 2:
+        return '2'
+    else:
+        return '3'
+
+train['Pclass'] = train['Pclass'].apply(Pclasscorr)
+pclass = pd.get_dummies(train['Pclass'])
+train = pd.concat([train, pclass], axis = 1)
+
+
+def SibSpcorr(columns):
+    if pd.isnull(columns[0]) == True:
+        if columns[1] == 1:
+            return 0.5
+        else:
+            return 0
+    else:
+        return columns[0]
+
+def Farecorr(columns):
+    if pd.isnull(columns[0]) == True:
+        if columns[1] == 1:
+            return 55
+        elif columns[1] == 2:
+            return 20
+        else:
+            return 12
+    else:
+        return columns[0]
+    
+def Farecat(column):
+    if column<=30:
+        return 0
+    elif 30<column<=70:
+        return 1
+    else:
+        return 2
+train['Fare'] = train['Fare'].apply(Farecat)
+
+def namesplit(columns):
+    a = columns[0].split()
+    if a[1] == 'Mr.':
+        return 0
+    elif a[1] == 'Mrs.':
+        return 2
+    elif a[1] == 'Miss.':
+        return 1
+    elif a[1] == 'Master.':
+        return 3
+    else:
+        return 4
+
+Sex = pd.get_dummies(train['Sex'])
+train = pd.concat([train, Sex], axis = 1)
+train.drop(['Sex', 'Ticket'], axis = 1, inplace = True)
+
+train['Name'] = train[['Name', 'female']].apply(namesplit, axis = 1)
+
+    
+#Q1 = train.quantile(0.15)
+#Q3 = train.quantile(0.85)
+#IQR = Q3 - Q1
+
+#train = train[(train >= Q1 - 1.5 * IQR) & (train <= Q3 + 1.5 *IQR)] 
+
+#train['SibSp'] = train[['SibSp', 'IsAlone']].apply(SibSpcorr, axis = 1)
+#train['Fare'] = train[['Fare', 'Pclass']].apply(Farecorr, axis = 1)
+#train['Parch'] = train[['Parch', 'female']].apply(parch_corr, axis = 1)
+#train['Cabin'] = train['Cabin'].apply(cabin_crr)
+#train['Cabin'] = train['Cabin'].fillna(train['Cabin'].mean())
+#train.drop(['Cabin'], axis = 1, inplace = True)
+train['Embarked'] = train['Embarked'].fillna(train['Embarked'].mean())
+train['richfemale'] = train[['Fare', 'Pclass', 'female']].apply(richfemale, axis = 1)
+train.drop('Pclass', axis = 1, inplace = True)
+
+#train.drop(['Pclass', 'male', 'Parch', 'Age'], axis = 1, inplace = True)
+
+#scaler= StandardScaler()
+#survived = train['Survived']
+#train.drop(['Survived'], axis = 1, inplace = True)
+#scaler.fit(train)
+#scaleddata = scaler.transform(train)
+#train = pd.DataFrame(scaleddata, columns = train.columns)
+#train = pd.concat([train, survived], axis = 1)
+train
