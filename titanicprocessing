@@ -15,6 +15,9 @@ train.head()
 train.dtypes
 # To check types of columns in dataset
 
+train.isnull().sum()
+# To check how many NaN values this dataset have.
+
 sns.boxplot(y = data['Fare'], x = train['Survived'])
 # Here we can track the distribution of 'Fare' values, which is a continous, according to Survived.
 # We can and we should also use this boxplot by replacing 'Fare' with 'Age'. These boxplots can help us to hint about
@@ -46,8 +49,7 @@ def richfemale(columns):
 # then they can be considered as very rich, if Pclass is 2 or 3, without concering the sex this time 
 # I set it as intermediate rich, which is 3) or finally poor (0).  
 
-
-# To check 
+ 
 def parch_corr(columns):
     if pd.isnull(columns[0]) == True:
         if columns[1] == 0:
@@ -89,8 +91,11 @@ def agedet(columns):
             return 25
     else:
         return Age
+        
 train['Age'] = train[['Age', 'Pclass', 'Embarked']].apply(agedet, axis = 1)
-# 
+# 'Age' column is a continous distribution and contains significant amount of NaN values. This function here
+# fills the NaN values by taking into account 'Pclass' and 'Embarked' columns, which its dependence on these columns was
+# analysed through boxplot.
     
 def agecat(column):
     if column <= 15:
@@ -101,6 +106,8 @@ def agecat(column):
         return 2
 
 train['Age'] = train['Age'].apply(agecat)
+# We corrected some NaN values of 'Age' column. This time I am transforming it from continous distribution
+# to discrete one.
 
 train['Cabin'] = train['Cabin'].fillna(0)
 
@@ -141,35 +148,6 @@ pclass = pd.get_dummies(train['Pclass'])
 train = pd.concat([train, pclass], axis = 1)
 
 
-def SibSpcorr(columns):
-    if pd.isnull(columns[0]) == True:
-        if columns[1] == 1:
-            return 0.5
-        else:
-            return 0
-    else:
-        return columns[0]
-
-def Farecorr(columns):
-    if pd.isnull(columns[0]) == True:
-        if columns[1] == 1:
-            return 55
-        elif columns[1] == 2:
-            return 20
-        else:
-            return 12
-    else:
-        return columns[0]
-    
-def Farecat(column):
-    if column<=30:
-        return 0
-    elif 30<column<=70:
-        return 1
-    else:
-        return 2
-train['Fare'] = train['Fare'].apply(Farecat)
-
 def namesplit(columns):
     a = columns[0].split()
     if a[1] == 'Mr.':
@@ -189,30 +167,8 @@ train.drop(['Sex', 'Ticket'], axis = 1, inplace = True)
 
 train['Name'] = train[['Name', 'female']].apply(namesplit, axis = 1)
 
-    
-#Q1 = train.quantile(0.15)
-#Q3 = train.quantile(0.85)
-#IQR = Q3 - Q1
-
-#train = train[(train >= Q1 - 1.5 * IQR) & (train <= Q3 + 1.5 *IQR)] 
-
-#train['SibSp'] = train[['SibSp', 'IsAlone']].apply(SibSpcorr, axis = 1)
-#train['Fare'] = train[['Fare', 'Pclass']].apply(Farecorr, axis = 1)
-#train['Parch'] = train[['Parch', 'female']].apply(parch_corr, axis = 1)
-#train['Cabin'] = train['Cabin'].apply(cabin_crr)
-#train['Cabin'] = train['Cabin'].fillna(train['Cabin'].mean())
-#train.drop(['Cabin'], axis = 1, inplace = True)
 train['Embarked'] = train['Embarked'].fillna(train['Embarked'].mean())
 train['richfemale'] = train[['Fare', 'Pclass', 'female']].apply(richfemale, axis = 1)
 train.drop('Pclass', axis = 1, inplace = True)
 
-#train.drop(['Pclass', 'male', 'Parch', 'Age'], axis = 1, inplace = True)
-
-#scaler= StandardScaler()
-#survived = train['Survived']
-#train.drop(['Survived'], axis = 1, inplace = True)
-#scaler.fit(train)
-#scaleddata = scaler.transform(train)
-#train = pd.DataFrame(scaleddata, columns = train.columns)
-#train = pd.concat([train, survived], axis = 1)
 train
