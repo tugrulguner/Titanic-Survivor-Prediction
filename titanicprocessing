@@ -180,5 +180,29 @@ train['Embarked'] = train['Embarked'].fillna(train['Embarked'].mean())
 train['richfemale'] = train[['Fare', 'Pclass', 'female']].apply(richfemale, axis = 1)
 train.drop('Pclass', axis = 1, inplace = True)
 
+# I fill 'Embarked' column with mean since it has very few NaN values, which is only 2. Then I add 'richfemale' column that I 
+# already described above and then I dropped the 'Pclass' column since I already add 3 different columns representing this
+# single column.
 
-train
+X_train, X_test, y_train, y_test = train_test_split(train.drop(['Survived'], axis = 1), 
+                                                         train['Survived'], test_size=0.3, random_state = 42)
+n_estimators = [50, 250, 500, 750, 1000, 1500, 3000, 5000]
+max_features = ['auto', 'sqrt', 'log2']
+max_depth = [10, 25, 40, 50]
+max_depth.append(None)
+min_samples_split = [2, 5, 15, 20]
+min_samples_leaf = [1, 2, 5, 10]
+
+grid_param = {'n_estimators': n_estimators, 'max_features': max_features, 'max_depth': max_depth, 
+              'min_samples_split': min_samples_split, 'min_samples_leaf': min_samples_leaf}
+
+RF = RandomForestClassifier(random_state = 42)
+
+RF_random = RandomizedSearchCV(estimator = RF, param_distributions = grid_param, n_iter = 500,
+                              cv = 5, verbose = 2, random_state = 42, n_jobs = -1)
+RF_random.fit(X_train, y_train)
+print(RF_random.best_params_)
+
+# Here I split the data into train and test as using 0.3 for test_size. Then I start for hyperparameter optimization by using 
+# Randomized Search CV for the Random Forest Classifier through assigning some possible value ranges for particular parameters
+# like n_estimators, max_features, etc.
