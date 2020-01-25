@@ -110,6 +110,7 @@ train['Age'] = train['Age'].apply(agecat)
 # to discrete one.
 
 train['Cabin'] = train['Cabin'].fillna(0)
+# First I replace NaN values with 0.
 
 def cabin_crr(columns):
         if columns == 0:
@@ -134,6 +135,8 @@ def cabin_crr(columns):
                 return 8 
         
 train['Cabin'] = train['Cabin'].apply(cabin_crr)
+# After replacing NaN values with zero, then I check first element of nonzero values and assign different values according
+# to their uniqueness. However, total sum of missing values in 'Cabin' column is a lot, but I will continue to keep this column.
 
 def Pclasscorr(column):
     if column == 1:
@@ -145,8 +148,11 @@ def Pclasscorr(column):
 
 train['Pclass'] = train['Pclass'].apply(Pclasscorr)
 pclass = pd.get_dummies(train['Pclass'])
-train = pd.concat([train, pclass], axis = 1)
 
+train = pd.concat([train, pclass], axis = 1)
+# Here, first I replace integers in 'Pclass' column with strings, which makes it very easy to go for separate this single
+# column with 1, 2 and 3 values into 3 new columns consisting of 0 and 1 for corresponding values. This part is not something
+# that I think make significant difference. We can leave it as a single column without touching it.
 
 def namesplit(columns):
     a = columns[0].split()
@@ -166,9 +172,13 @@ train = pd.concat([train, Sex], axis = 1)
 train.drop(['Sex', 'Ticket'], axis = 1, inplace = True)
 
 train['Name'] = train[['Name', 'female']].apply(namesplit, axis = 1)
+# I think this part can be quite important. After finding how many unique titles that 'Name' column contain, we can select 
+# the mostly used ones and assign value for them. Here I took first 4 highly used titles and leave remainings as same with a
+# fixed value of 4.
 
 train['Embarked'] = train['Embarked'].fillna(train['Embarked'].mean())
 train['richfemale'] = train[['Fare', 'Pclass', 'female']].apply(richfemale, axis = 1)
 train.drop('Pclass', axis = 1, inplace = True)
+
 
 train
