@@ -7,12 +7,15 @@ from sklearn.model_selection import cross_validate
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, ExtraTreesClassifier
 from sklearn.pipeline import Pipeline
 
-data = pd.read_csv('/kaggle/input/titanic/train.csv')
-data.drop(['PassengerId'], axis = 1, inplace = True)
-data.head()
+train = pd.read_csv('/kaggle/input/titanic/train.csv')
+train.drop(['PassengerId'], axis = 1, inplace = True)
+train.head()
 # Here I'm dropping the first column indicating the Id of passengers
 
-sns.boxplot(y = data['Fare'], x = data['Survived'])
+train.dtypes
+# To check types of columns in dataset
+
+sns.boxplot(y = data['Fare'], x = train['Survived'])
 # Here we can track the distribution of 'Fare' values, which is a continous, according to Survived.
 # We can and we should also use this boxplot by replacing 'Fare' with 'Age'. These boxplots can help us to hint about
 # what NaN values in 'Fare' and 'Age' columns can be replaced by without putting rough values like mean.
@@ -22,6 +25,7 @@ def isalone(column):
         return 0
     else:
         return 1
+
 train['IsAlone'] = train['Parch'].apply(isalone)
 # This adds a new column that can show whether passenger is alone or not using the 'Parch' information. 
 
@@ -41,7 +45,9 @@ def richfemale(columns):
 # whether passenger is female and rich (1) or male and rich (2) (1 and 2 based on Pclass, if Pclass is 1
 # then they can be considered as very rich, if Pclass is 2 or 3, without concering the sex this time 
 # I set it as intermediate rich, which is 3) or finally poor (0).  
-    
+
+
+# To check 
 def parch_corr(columns):
     if pd.isnull(columns[0]) == True:
         if columns[1] == 0:
@@ -50,6 +56,11 @@ def parch_corr(columns):
             return 0.5
     else:
         return columns[0]
+
+train['Embarked'].value_counts()
+# To check how many unique values 'Embarked' column has and it shows there are only 3, 'C', 'S', and 'Q'. I assign values for each.
+# But for NaN values I take them into account and leave them as 0. If we want to assign more precise values for NaN values
+# we can easily fill zeros with what we want in future.
 
 def embarkcorr(column):
     if column == 'C':
@@ -61,6 +72,7 @@ def embarkcorr(column):
     else:
         return 0
 train['Embarked'] = train['Embarked'].apply(embarkcorr)
+# Assign of these values are completely random, I didn't consider any pattern or strategy.
 
 def agedet(columns):
     Age = columns[0]
@@ -78,6 +90,7 @@ def agedet(columns):
     else:
         return Age
 train['Age'] = train[['Age', 'Pclass', 'Embarked']].apply(agedet, axis = 1)
+# 
     
 def agecat(column):
     if column <= 15:
