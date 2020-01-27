@@ -15,3 +15,5 @@ Here is the confusion matrix that I obtain after having 0.85 score (with my own 
 ![Confusion matrix of the Training data](Confusion_Matrix_trainingdata.png)
 
 
+It obvious that we have still some serious prediction problems. The model or preprocessing or both should be improved in order to reduce
+these error that my model made.
