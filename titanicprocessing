@@ -184,6 +184,10 @@ train.drop('Pclass', axis = 1, inplace = True)
 # already described above and then I dropped the 'Pclass' column since I already add 3 different columns representing this
 # single column.
 
+plt.figure(figsize=(20,10))
+sns.heatmap(train.corr(), annot = True)
+# To see how much these columns are correlated before going into training 
+
 X_train, X_test, y_train, y_test = train_test_split(train.drop(['Survived'], axis = 1), 
                                                          train['Survived'], test_size=0.3, random_state = 42)
 n_estimators = [50, 250, 500, 750, 1000, 1500, 3000, 5000]
