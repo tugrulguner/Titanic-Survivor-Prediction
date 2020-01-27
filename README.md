@@ -4,6 +4,6 @@ I want to share my code that mainly focuses on feature engineering. With this co
 
 For the code: 'titanicprocessing', I put some comments for every function, parameter, model, etc. to make everything as simple as possible in terms of understanding and following it line by line. Please keep me noticed if you find anything confusing or unclear.  
 
-Here is the heatmap figure of training data:
+Here is the heatmap(seaborn) figure of training data indicating how much columns are correlated with each other and with 'Survived':
 
 ![Seaborn Heatmap of the Training data](Seaborn_heatmap_trainingdata.png)
