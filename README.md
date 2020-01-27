@@ -6,4 +6,4 @@ For the code: 'titanicprocessing', I put some comments for every function, param
 
 Here is the heatmap figure of training data:
 
-![Seaborn Heatmap of the Training data]()
+![Seaborn Heatmap of the Training data](Seaborn_heatmap_trainingdata.png)
