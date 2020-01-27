@@ -235,6 +235,10 @@ while degerson < 0.85:
 deger['test_score'].mean()
 # To see what score I got
 
+cfm = confusion_matrix(y_test, model.predict(X_test))
+sns.heatmap(cfm, annot = True, fmt = 'd')
+# To visualize confusion matrix
+
 # --------------- Preprocessing and Fit of the Test Sample Part ------------------
 
 test = pd.read_csv('/kaggle/input/titanic/test.csv')
