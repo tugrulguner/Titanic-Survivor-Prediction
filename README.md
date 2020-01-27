@@ -11,4 +11,7 @@ Here is the heatmap(seaborn) figure of training data indicating how much columns
 
 Here is the confusion matrix that I obtain after having 0.85 score (with my own error calculating function: cross-validation)
 
+
 ![Confusion matrix of the Training data](Confusion_Matrix_trainingdata.png)
+
+
