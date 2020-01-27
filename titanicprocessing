@@ -206,3 +206,67 @@ print(RF_random.best_params_)
 # Here I split the data into train and test as using 0.3 for test_size. Then I start for hyperparameter optimization by using 
 # Randomized Search CV for the Random Forest Classifier through assigning some possible value ranges for particular parameters
 # like n_estimators, max_features, etc.
+
+k = 1
+deger = 0
+degerson = 0 
+
+
+while degerson < 0.85:
+    X_train, X_test, y_train, y_test = train_test_split(train.drop(['Survived'], axis = 1), 
+                                                         train['Survived'], test_size=0.3)
+    
+    model = RandomForestClassifier(n_estimators = 5000, min_samples_split = 15, min_samples_leaf = 1, max_features = 'log2', 
+                                   max_depth = 40) # These values were determined through Randomized Search CV above 
+    model.fit(X_train, y_train) 
+    deger = cross_validate(model, X_test, y_test, cv=30) # I like to use cross validation to determine my score
+    degerson = deger['test_score'].mean()
+    k += 1
+    if k>1000:
+        break
+    # Here I put certain contraint on the loop, if I couldn't find score higher than 0.85, It will stop after some certain 
+    # iteration. I can improve this part here to involve even though it couldnt find better score than 0.85, it can select
+    # the best one it got during the process.
+
+deger['test_score'].mean()
+# To see what score I got
+
+# --------------- Preprocessing and Fit of the Test Sample Part ------------------
+
+test = pd.read_csv('/kaggle/input/titanic/test.csv')
+
+test['Embarked'] = test['Embarked'].apply(embarkcorr)
+test['Age'] = test[['Age', 'Pclass', 'Embarked']].apply(agedet, axis = 1)
+test['Age'] = test['Age'].apply(agecat)
+test['IsAlone'] = test['Parch'].apply(isalone)
+test['Pclass'] = test['Pclass'].apply(Pclasscorr)
+pclasst = pd.get_dummies(test['Pclass'])
+test = pd.concat([test, pclasst], axis = 1)
+test.drop('Pclass', axis = 1, inplace = True)
+test['Cabin'] = test['Cabin'].fillna(0)
+test['Cabin'] = test['Cabin'].apply(cabin_crr)
+test['Fare'] = test['Fare'].apply(Farecat)
+Sex = pd.get_dummies(test['Sex'])
+test = pd.concat([test, Sex], axis = 1)
+df = test['PassengerId']
+test.drop(['PassengerId', 'Sex', 'Ticket'], axis = 1, inplace= True)
+
+test['Name'] = test[['Name','female']].apply(namesplit, axis = 1)
+test['Embarked'] = test['Embarked'].fillna('backfill')
+
+test['richfemale'] = test[['Fare', 'Pclass', 'female']].apply(richfemale, axis = 1)
+
+# So far I have just applied my functions that I used as preprocessing of training data, nothing is new here.
+# They are in the same order and test data was exposed to same preprocessing that we did with the train data.
+# We can do this easily by using pipeline but since this way my first seriously taken kaggle challenge, I lam leaving it like
+# this. 
+
+predictt = model.predict(test) # Making predictions using already fitted model above through train data
+df = pd.DataFrame(df, columns=['PassengerId'])
+dff = pd.DataFrame(predictt, columns=['Survived'])
+sonuc = pd.concat([df, dff], axis = 1)
+
+sonuc.to_csv('/kaggle/working/predict.csv', index = False)
+# We create document consisting of our predictions and ready for submission to kaggle
+
+
