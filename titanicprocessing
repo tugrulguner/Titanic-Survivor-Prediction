@@ -220,7 +220,7 @@ while degerson < 0.85:
     X_train, X_test, y_train, y_test = train_test_split(train.drop(['Survived'], axis = 1), 
                                                          train['Survived'], test_size=0.3)
     
-    model = RandomForestClassifier(n_estimators = 5000, min_samples_split = 15, min_samples_leaf = 1, max_features = 'log2', 
+    model = RandomForestClassifier(n_estimators = 500, min_samples_split = 15, min_samples_leaf = 1, max_features = 'log2', 
                                    max_depth = 40) # These values were determined through Randomized Search CV above 
     model.fit(X_train, y_train) 
     deger = cross_validate(model, X_test, y_test, cv=30) # I like to use cross validation to determine my score
@@ -238,6 +238,9 @@ deger['test_score'].mean()
 # --------------- Preprocessing and Fit of the Test Sample Part ------------------
 
 test = pd.read_csv('/kaggle/input/titanic/test.csv')
+
+test.isnull().sum()
+# To check how many NaN values are there in the test dataset
 
 test['Embarked'] = test['Embarked'].apply(embarkcorr)
 test['Age'] = test[['Age', 'Pclass', 'Embarked']].apply(agedet, axis = 1)
