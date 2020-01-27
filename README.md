@@ -7,3 +7,8 @@ For the code: 'titanicprocessing', I put some comments for every function, param
 Here is the heatmap(seaborn) figure of training data indicating how much columns are correlated with each other and with 'Survived':
 
 ![Seaborn Heatmap of the Training data](Seaborn_heatmap_trainingdata.png)
+
+
+Here is the confusion matrix that I obtain after having 0.85 score (with my own error calculating function: cross-validation)
+
+![Confusion matrix of the Training data](Confusion_Matrix_trainingdata.png)
